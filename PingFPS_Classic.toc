@@ -1,0 +1,8 @@
+## Interface: 11404
+## Title: PingFPS Classic
+## Author: Rathio12
+## Version: 1.0.0
+## Notes: Lightweight Ping & FPS display for Classic and TBC
+## SavedVariables: PingFPSClassicDB
+
+PingFPS_Classic.lua
