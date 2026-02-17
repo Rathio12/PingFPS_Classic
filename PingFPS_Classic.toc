@@ -1,10 +1,10 @@
-## Interface: 20505
-## Interface-Classic: 11506
+## Interface: 11508
+## Interface-Classic: 11508
 ## Interface-BCC: 20505
 ## Title: PingFPS Classic
 ## Author: Rathio12
-## Version: 1.0.5
-## Notes: Shift + Left Click to move. Position saves.
+## Version: 1.0.7
+## Notes: Shift + Left Click to move. Saves positions.
 ## SavedVariables: PingFPSClassicDB
 
 PingFPS_Classic.lua

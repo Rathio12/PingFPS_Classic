@@ -1,7 +1,7 @@
--- Create the frame with Backdrop support for the 2026 client
+-- Create Frame with modern Backdrop support (essential for 1.15.8 and 2.05.05)
 local frame = CreateFrame("Frame", "PingFPSClassicFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 
--- 1. Setup Visuals
+-- 1. Configuration & Visuals
 frame:SetSize(130, 26)
 frame:SetClampedToScreen(true)
 frame:SetMovable(true)
@@ -19,7 +19,7 @@ frame:SetBackdropColor(0, 0, 0, 0.7)
 local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 text:SetPoint("CENTER", 0, 1)
 
--- 2. Shift + Left Click Move Logic
+-- 2. Shift + Left Click Drag Logic
 frame:SetScript("OnDragStart", function(self)
     if IsShiftKeyDown() then
         self:StartMoving()
@@ -28,7 +28,7 @@ end)
 
 frame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
-    -- Save exact position to the Database
+    -- Save position immediately
     local point, _, _, x, y = self:GetPoint()
     if not PingFPSClassicDB then PingFPSClassicDB = {} end
     PingFPSClassicDB.point = point
@@ -48,7 +48,7 @@ frame:SetScript("OnUpdate", function(self, elapsed)
     text:SetFormattedText("FPS: |cffffffff%d|r  MS: |cffffffff%d|r", fps, worldPing or 0)
 end)
 
--- 4. Event Handler to Load Position
+-- 4. Initialization (Loading Saved Position)
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon)
     if addon ~= "PingFPS_Classic" then return end
@@ -62,5 +62,5 @@ frame:SetScript("OnEvent", function(self, event, addon)
     self:ClearAllPoints()
     self:SetPoint(PingFPSClassicDB.point, UIParent, PingFPSClassicDB.point, PingFPSClassicDB.x, PingFPSClassicDB.y)
     
-    print("|cff00ff00PingFPS Classic Loaded!|r Shift+Click to drag.")
+    print("|cff00ff00PingFPS Loaded!|r Shift + Left Click to drag.")
 end)
