@@ -1,31 +1,34 @@
--- 1. Initialize Frame with Backdrop Template (Required for Modern Classic/Cata)
+-- 1. Create the Frame with Backdrop Compatibility
+-- This check ensures it works on both the old TBC engine and the modern Anniversary engine
 local frame = CreateFrame("Frame", "PingFPSClassicFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 
 -- 2. Configuration & Defaults
-local function GetDefaults()
-    return {
-        point = "CENTER",
-        x = 0,
-        y = 0,
-        locked = false,
-    }
+local function ApplyDefaults()
+    if not PingFPSClassicDB then
+        PingFPSClassicDB = {
+            point = "CENTER",
+            x = 0,
+            y = 0,
+            locked = false,
+        }
+    end
 end
 
--- 3. Setup Visuals
+-- 3. Visual Setup
 frame:SetSize(130, 26)
 frame:SetClampedToScreen(true)
 frame:SetMovable(true)
 frame:EnableMouse(true)
 frame:RegisterForDrag("LeftButton")
 
+-- Backdrop settings (The classic look)
 frame:SetBackdrop({
-    bgFile = "Interface\\Buttons\\WHITE8X8",
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
     edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
     tile = true, tileSize = 16, edgeSize = 12,
     insets = { left = 3, right = 3, top = 3, bottom = 3 }
 })
 frame:SetBackdropColor(0, 0, 0, 0.6)
-frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.8)
 
 local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 text:SetPoint("CENTER", 0, 1)
@@ -39,68 +42,48 @@ end)
 
 frame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
-    local point, _, _, xOfs, yOfs = self:GetPoint()
+    local point, _, _, x, y = self:GetPoint()
     PingFPSClassicDB.point = point
-    PingFPSClassicDB.x = xOfs
-    PingFPSClassicDB.y = yOfs
+    PingFPSClassicDB.x = x
+    PingFPSClassicDB.y = y
 end)
 
--- 5. Data Update Logic (Optimized to 1 second intervals)
-local timer = 0
+-- 5. Data Refresh (TBC/Classic safe)
+local lastUpdate = 0
 frame:SetScript("OnUpdate", function(self, elapsed)
-    timer = timer + elapsed
-    if timer < 1 then return end
-    timer = 0
+    lastUpdate = lastUpdate + elapsed
+    if lastUpdate < 1 then return end -- Refresh once per second
+    lastUpdate = 0
 
     local fps = floor(GetFramerate())
+    -- GetNetStats returns 4 values in TBC/Classic Era (Down, Up, Home Ping, World Ping)
     local _, _, _, latencyWorld = GetNetStats()
     
-    -- Color text red if ping is high (>200)
-    local pingColor = (latencyWorld > 200) and "|cffff0000" or "|cffffffff"
-    text:SetFormattedText("FPS: |cffffffff%d|r  Ping: %s%d|rms", fps, pingColor, latencyWorld)
+    text:SetFormattedText("FPS: |cffffffff%d|r  Ping: |cffffffff%d|rms", fps, latencyWorld or 0)
 end)
 
--- 6. Variables Loading & Positioning
+-- 6. Initialization
 frame:RegisterEvent("ADDON_LOADED")
-frame:RegisterEvent("PLAYER_LOGIN")
-
 frame:SetScript("OnEvent", function(self, event, addon)
-    if event == "ADDON_LOADED" and addon == "PingFPS_Classic" then
-        -- Handle SavedVariables
-        if not PingFPSClassicDB then
-            PingFPSClassicDB = GetDefaults()
-        else
-            -- Ensure any missing keys from updates are filled
-            local defaults = GetDefaults()
-            for k, v in pairs(defaults) do
-                if PingFPSClassicDB[k] == nil then
-                    PingFPSClassicDB[k] = v
-                end
-            end
-        end
-    elseif event == "PLAYER_LOGIN" then
-        -- Set Position after UI is fully ready
-        self:ClearAllPoints()
-        self:SetPoint(
-            PingFPSClassicDB.point, 
-            UIParent, 
-            PingFPSClassicDB.point, 
-            PingFPSClassicDB.x, 
-            PingFPSClassicDB.y
-        )
-        
-        local lockStatus = PingFPSClassicDB.locked and "Locked" or "Unlocked"
-        print("|cff00ff00PingFPS Classic|r loaded. Current status: " .. lockStatus)
-    end
+    if addon ~= "PingFPS_Classic" then return end
+    
+    ApplyDefaults()
+
+    -- Apply saved position
+    self:ClearAllPoints()
+    self:SetPoint(
+        PingFPSClassicDB.point, 
+        UIParent, 
+        PingFPSClassicDB.point, 
+        PingFPSClassicDB.x, 
+        PingFPSClassicDB.y
+    )
 end)
 
--- 7. Slash Commands
+-- 7. Slash Command to Lock/Unlock
 SLASH_PINGFPS1 = "/pingfps"
 SlashCmdList["PINGFPS"] = function()
     PingFPSClassicDB.locked = not PingFPSClassicDB.locked
-    if PingFPSClassicDB.locked then
-        print("|cff00ff00PingFPS Classic:|r Frame Locked.")
-    else
-        print("|cffff0000PingFPS Classic:|r Frame Unlocked (Drag to move).")
-    end
+    local status = PingFPSClassicDB.locked and "|cff00ff00Locked|r" or "|cffff0000Unlocked|r"
+    print("|cff00ff00PingFPS:|r Frame is now " .. status)
 end

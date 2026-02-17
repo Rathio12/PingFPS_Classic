@@ -1,11 +1,11 @@
 ## Interface: 11502
 ## Interface-Classic: 11502
 ## Interface-BCC: 20504
-## Interface-Cata: 40400
+## Interface-Cata: 44000
 ## Title: PingFPS Classic
 ## Author: Rathio12
 ## Version: 1.0.0
-## Notes: Lightweight Ping & FPS display for Classic versions.
+## Notes: Lightweight Ping & FPS display for Classic Era and TBC
 ## SavedVariables: PingFPSClassicDB
 
 PingFPS_Classic.lua
