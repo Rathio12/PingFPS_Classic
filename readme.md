@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**PingFPS** is a lightweight World of Warcraft Retail addon that displays your **network ping (MS)** and **FPS** in real-time. The frame is **movable**, **color-coded based on performance**, and includes a **simple options panel**.  
+**PingFPS** is a lightweight World of Warcraft Classic & TBC addon that displays your **network ping (MS)** and **FPS** in real-time. The frame is **movable**, **color-coded based on performance**, and includes a **simple options panel**.  
 
 ---
 
